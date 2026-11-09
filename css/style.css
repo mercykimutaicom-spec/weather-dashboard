@@ -66,3 +66,161 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Arrange the sidebar content with comfortable space between sections. */
+.search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vh, 3rem);
+}
+
+/* Give the Weatherly name a strong visual hierarchy. */
+.search-panel .app-brand h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.search-panel .app-brand h1 span {
+  color: var(--color-accent);
+}
+
+.search-panel .app-brand p {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-muted);
+}
+
+/* Keep sidebar sections and form fields consistently spaced. */
+.search-panel .search-section,
+.search-panel .location-section,
+.search-panel .recent-searches {
+  display: grid;
+  gap: 1rem;
+}
+
+.search-panel h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.search-panel .search-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.search-panel .search-form label {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Make the search field comfortable to read and operate. */
+.search-panel .search-input-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+}
+
+/* Stack the search controls when the available screen width is narrow. */
+@media (max-width: 420px) {
+  .search-panel .search-input-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.search-panel .search-input-group input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-glass-border);
+  border-radius: 12px;
+  background: var(--color-glass);
+  color: var(--color-text);
+  font: inherit;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.search-panel .search-input-group input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.search-panel .search-input-group button,
+.search-panel .location-button {
+  min-height: 46px;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.search-panel .search-input-group button {
+  background: var(--color-accent);
+  color: var(--color-background-dark);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    filter var(--transition),
+    transform var(--transition);
+}
+
+.search-panel .search-input-group button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Keep the location action distinct while matching the glass panels. */
+.search-panel .location-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-color: var(--color-glass-border);
+  background: var(--color-glass);
+  color: var(--color-text);
+}
+
+.search-panel .location-button:hover {
+  border-color: var(--color-accent);
+}
+
+/* Show a consistent, high-visibility focus ring for keyboard users. */
+.search-panel .search-input-group input:focus-visible,
+.search-panel .search-input-group button:focus-visible,
+.search-panel .location-button:focus-visible {
+  border-color: var(--color-accent);
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.search-panel .search-error {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+/* Present recent cities as a tidy list of readable glass items. */
+.search-panel .recent-searches ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-panel .recent-searches li {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-glass-border);
+  border-radius: 12px;
+  background: var(--color-glass);
+  color: var(--color-text);
+}
+
+.search-panel .recent-searches .empty-history {
+  color: var(--color-text-muted);
+}
