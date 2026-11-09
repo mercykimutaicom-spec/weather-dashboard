@@ -1,0 +1,68 @@
+/* Shared colors and measurements used throughout the dashboard. */
+:root {
+  --color-background: #064E3B;
+  --color-background-dark: #022C22;
+  --color-accent: #34D399;
+  --color-text: #F8FAFC;
+  --color-text-muted: #A7F3D0;
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 20px;
+  --border-radius: 24px;
+  --transition: 200ms ease;
+}
+
+/* Make element widths include their padding and borders. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Set the page background, base font, and default text color. */
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  font-family: "Inter", Arial, sans-serif;
+  color: var(--color-text);
+
+  /* A simple deep-green gradient creates the Forest Glass backdrop. */
+  background: linear-gradient(135deg, var(--color-background), var(--color-background-dark));
+}
+
+/* Keep the dashboard centered and arrange its panels in two columns. */
+.dashboard-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+  align-items: stretch;
+}
+
+/* Keep long content from forcing either grid column wider than the screen. */
+.search-panel,
+.weather-display {
+  min-width: 0;
+  min-height: 100%;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* Give both main panels a translucent glass surface. */
+.glass-panel {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+/* Stack the panels on phones and other narrow screens. */
+@media (max-width: 760px) {
+  .dashboard-container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
