@@ -74,6 +74,79 @@
         </ul>
       </section>
     </aside>
+    <!-- Right Weather Display -->
+    <section class="weather-display glass-panel">
+      <!-- Weather Header -->
+      <header class="weather-header">
+        <div>
+          <p class="section-label">WEATHER OVERVIEW</p>
+          <h2 id="current-city">Search for a city</h2>
+          <p id="current-date">Your weather at a glance</p>
+        </div>
+
+        <div class="weather-status" id="weather-status" aria-live="polite">
+          Ready to explore
+        </div>
+      </header>
+
+      <!-- Current Weather -->
+      <section class="current-weather">
+        <div class="weather-main">
+          <div class="weather-icon" id="weather-icon" aria-hidden="true">
+            ☀️
+          </div>
+
+          <div>
+            <p class="temperature" id="current-temp">--°</p>
+            <p id="weather-description">Weather condition</p>
+          </div>
+        </div>
+
+        <p class="feels-like">Feels like <span id="feels-like">--°</span></p>
+      </section>
+
+      <!-- Weather Details -->
+      <section class="weather-details">
+        <h3>Today's Highlights</h3>
+
+        <div class="details-grid">
+          <article class="detail-card">
+            <p>Humidity</p>
+            <h4 id="humidity">--%</h4>
+          </article>
+
+          <article class="detail-card">
+            <p>Wind Speed</p>
+            <h4 id="wind-speed">-- km/h</h4>
+          </article>
+        </div>
+      </section>
+
+      <!-- Three-Day Forecast -->
+      <section class="forecast-section">
+        <h3>3-Day Forecast</h3>
+
+        <div class="forecast-list" id="forecast-list">
+          <article class="forecast-card">
+            <p>Day 1</p>
+            <span aria-hidden="true">☀️</span>
+            <h4>--°</h4>
+          </article>
+
+          <article class="forecast-card">
+            <p>Day 2</p>
+            <span aria-hidden="true">🌤️</span>
+            <h4>--°</h4>
+          </article>
+
+          <article class="forecast-card">
+            <p>Day 3</p>
+            <span aria-hidden="true">🌧️</span>
+            <h4>--°</h4>
+          </article>
+        </div>
+      </section>
+    </section>
 
     <!-- JavaScript -->
     <script src="js/script.js"></script>
