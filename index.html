@@ -24,9 +24,56 @@
   </head>
 
   <body>
-    <main class="dashboard-container">
-      <!-- Dashboard content will go here -->
-    </main>
+    <!-- Left Search Panel -->
+    <aside class="search-panel glass-panel">
+      <!-- App Branding -->
+      <div class="app-brand">
+        <h1>Weather<span>ly</span></h1>
+        <p>Your daily weather companion</p>
+      </div>
+
+      <!-- City Search -->
+      <section class="search-section">
+        <h2>Explore Weather</h2>
+
+        <form class="search-form" id="search-form">
+          <label for="city-search">Search for a city</label>
+
+          <div class="search-input-group">
+            <input
+              type="text"
+              id="city-search"
+              placeholder="Enter city name..."
+              autocomplete="off"
+              required
+            />
+
+            <button type="submit" id="search-button">Search</button>
+          </div>
+        </form>
+
+        <p class="search-error" id="search-error" role="alert"></p>
+      </section>
+
+      <!-- Current Location -->
+      <section class="location-section">
+        <h2>Your Location</h2>
+
+        <button type="button" class="location-button" id="location-button">
+          <span aria-hidden="true">⌖</span>
+          Use My Current Location
+        </button>
+      </section>
+
+      <!-- Recent Searches -->
+      <section class="recent-searches">
+        <h2>Recent Searches</h2>
+
+        <ul id="recent-cities">
+          <li class="empty-history">Your recent cities will appear here.</li>
+        </ul>
+      </section>
+    </aside>
 
     <!-- JavaScript -->
     <script src="js/script.js"></script>
