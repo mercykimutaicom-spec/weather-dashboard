@@ -3,16 +3,19 @@
 ======================================== */
 
 :root {
-  --color-background: #064e3b;
-  --color-background-dark: #022c22;
-  --color-accent: #34d399;
-  --color-text: #f8fafc;
-  --color-text-muted: #a7f3d0;
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
-  --glass-blur: 20px;
-  --border-radius: 24px;
+  --color-background: #F4F6F8;
+  --color-background-alt: #FFFFFF;
+  --color-primary-text: #1A202C;
+  --color-secondary-text: #64748B;
+  --color-primary-blue: #2563EB;
+  --color-sky-blue: #38BDF8;
+  --color-success: #16A34A;
+  --color-border: #CBD5E1;
+  --color-shadow: rgba(0, 0, 0, 0.05);
+  --color-focus-outline: #38BDF8;
+  --border-radius: 12px;
   --transition: 200ms ease;
+  --color-text: var(--color-primary-text);
 }
 
 /* ========================================
@@ -30,13 +33,8 @@ body {
   margin: 0;
   padding: clamp(1rem, 3vw, 2.5rem);
   font-family: "Inter", Arial, sans-serif;
-  color: var(--color-text);
-
-  background: linear-gradient(
-    135deg,
-    var(--color-background),
-    var(--color-background-dark)
-  );
+  color: var(--color-primary-text);
+  background: var(--color-background);
 }
 
 /* ========================================
@@ -67,8 +65,8 @@ body {
 /* Glassmorphism effect */
 
 .glass-panel {
-  background: var(--color-glass);
-  border: 1px solid var(--color-glass-border);
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
 
   backdrop-filter: blur(var(--glass-blur));
@@ -124,18 +122,17 @@ body {
   align-items: center;
   justify-content: center;
 
-  background: rgba(255, 255, 255, 0.09);
+  background: var(--color-background-alt);
 
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
 
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 
   box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.18),
-    inset 0 1px 2px rgba(255, 255, 255, 0.25),
-    0 0 24px rgba(52, 211, 153, 0.12);
+    0 8px 25px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25);
 
   transition:
     transform 250ms ease,
@@ -192,7 +189,7 @@ body {
 
   letter-spacing: 0.01em;
 
-  color: var(--color-text-muted);
+  color: var(--color-secondary-text);
 }
 
 /* ========================================
@@ -227,7 +224,7 @@ body {
 }
 
 .search-panel .search-form label {
-  color: var(--color-text-muted);
+  color: var(--color-secondary-text);
   font-size: 0.9rem;
 }
 
@@ -255,10 +252,10 @@ body {
 
   padding: 0.85rem 1rem;
 
-  border: 1px solid var(--color-glass-border);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
 
-  background: var(--color-glass);
+  background: var(--color-background-alt);
   color: var(--color-text);
 
   font: inherit;
@@ -269,7 +266,7 @@ body {
 }
 
 .search-panel .search-input-group input::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-secondary-text);
 }
 
 /* Search and location buttons */
@@ -296,8 +293,8 @@ body {
 /* Search button */
 
 .search-panel .search-input-group button {
-  background: var(--color-accent);
-  color: var(--color-background-dark);
+  background: var(--color-primary-blue);
+  color: var(--color-background-alt);
 
   transition:
     background-color var(--transition),
@@ -322,14 +319,14 @@ body {
   justify-content: center;
   gap: 0.6rem;
 
-  border-color: var(--color-glass-border);
+  border-color: var(--color-border);
 
-  background: var(--color-glass);
+  background: var(--color-background-alt);
   color: var(--color-text);
 }
 
 .search-panel .location-button:hover {
-  border-color: var(--color-accent);
+  border-color: var(--color-sky-blue);
 }
 
 /* ========================================
@@ -339,9 +336,9 @@ body {
 .search-panel .search-input-group input:focus-visible,
 .search-panel .search-input-group button:focus-visible,
 .search-panel .location-button:focus-visible {
-  border-color: var(--color-accent);
+  border-color: var(--color-primary-blue);
 
-  outline: 3px solid var(--color-accent);
+  outline: 3px solid var(--color-primary-blue);
   outline-offset: 3px;
 }
 
@@ -349,7 +346,7 @@ body {
 
 .search-panel .search-error {
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--color-secondary-text);
 }
 
 /* ========================================
@@ -369,15 +366,15 @@ body {
 .search-panel .recent-searches li {
   padding: 0.75rem 1rem;
 
-  border: 1px solid var(--color-glass-border);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
 
-  background: var(--color-glass);
+  background: var(--color-background-alt);
   color: var(--color-text);
 }
 
 .search-panel .recent-searches .empty-history {
-  color: var(--color-text-muted);
+  color: var(--color-secondary-text);
 }
 
 /* ========================================
