@@ -1,10 +1,13 @@
-/* Shared colors and measurements used throughout the dashboard. */
+/* ========================================
+   1. SHARED COLORS AND MEASUREMENTS
+======================================== */
+
 :root {
-  --color-background: #064E3B;
-  --color-background-dark: #022C22;
-  --color-accent: #34D399;
-  --color-text: #F8FAFC;
-  --color-text-muted: #A7F3D0;
+  --color-background: #064e3b;
+  --color-background-dark: #022c22;
+  --color-accent: #34d399;
+  --color-text: #f8fafc;
+  --color-text-muted: #a7f3d0;
   --color-glass: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: 20px;
@@ -12,14 +15,16 @@
   --transition: 200ms ease;
 }
 
-/* Make element widths include their padding and borders. */
+/* ========================================
+   2. GLOBAL STYLES
+======================================== */
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-/* Set the page background, base font, and default text color. */
 body {
   min-height: 100vh;
   margin: 0;
@@ -27,22 +32,31 @@ body {
   font-family: "Inter", Arial, sans-serif;
   color: var(--color-text);
 
-  /* A simple deep-green gradient creates the Forest Glass backdrop. */
-  background: linear-gradient(135deg, var(--color-background), var(--color-background-dark));
+  background: linear-gradient(
+    135deg,
+    var(--color-background),
+    var(--color-background-dark)
+  );
 }
 
-/* Keep the dashboard centered and arrange its panels in two columns. */
+/* ========================================
+   3. MAIN DASHBOARD LAYOUT
+======================================== */
+
 .dashboard-container {
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
+
   display: grid;
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
   gap: clamp(1rem, 2.5vw, 2rem);
+
   align-items: stretch;
 }
 
-/* Keep long content from forcing either grid column wider than the screen. */
+/* Main dashboard panels */
+
 .search-panel,
 .weather-display {
   min-width: 0;
@@ -50,49 +64,141 @@ body {
   padding: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-/* Give both main panels a translucent glass surface. */
+/* Glassmorphism effect */
+
 .glass-panel {
   background: var(--color-glass);
   border: 1px solid var(--color-glass-border);
   border-radius: var(--border-radius);
+
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  transition: background-color var(--transition), border-color var(--transition);
+
+  transition:
+    background-color var(--transition),
+    border-color var(--transition);
 }
 
-/* Stack the panels on phones and other narrow screens. */
+/* Stack dashboard panels on smaller screens */
+
 @media (max-width: 760px) {
   .dashboard-container {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-/* Arrange the sidebar content with comfortable space between sections. */
+/* ========================================
+   4. SIDEBAR LAYOUT
+======================================== */
+
 .search-panel {
   display: flex;
   flex-direction: column;
   gap: clamp(2rem, 5vh, 3rem);
 }
 
-/* Give the Weatherly name a strong visual hierarchy. */
-.search-panel .app-brand h1 {
+/* ========================================
+   5. VERDANT BRAND IDENTITY
+======================================== */
+
+.app-brand {
+  width: 100%;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Frosted Glass Cloud Container */
+
+.brand-logo {
+  position: relative;
+
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.09);
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    0 0 24px rgba(52, 211, 153, 0.12);
+
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Cloud SVG */
+
+.brand-logo svg {
+  display: block;
+
+  width: 64px;
+  height: 64px;
+
+  overflow: visible;
+
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+}
+
+/* Subtle Emerald Glow on Hover */
+
+.brand-logo:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3),
+    0 0 32px rgba(52, 211, 153, 0.22);
+}
+
+/* Verdant Brand Name */
+
+.brand-copy h1 {
   margin: 0;
+
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2rem);
+  font-weight: 700;
+
+  letter-spacing: -0.06em;
+  line-height: 1.2;
+
   color: var(--color-text);
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
 }
 
-.search-panel .app-brand h1 span {
-  color: var(--color-accent);
-}
+/* Brand Tagline */
 
-.search-panel .app-brand p {
-  margin: 0.5rem 0 0;
+.brand-copy p {
+  margin: 0.4rem 0 0;
+
+  font-family: "Inter", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+
+  letter-spacing: 0.01em;
+
   color: var(--color-text-muted);
 }
 
-/* Keep sidebar sections and form fields consistently spaced. */
+/* ========================================
+   6. SIDEBAR SECTIONS
+======================================== */
+
 .search-panel .search-section,
 .search-panel .location-section,
 .search-panel .recent-searches {
@@ -100,12 +206,20 @@ body {
   gap: 1rem;
 }
 
+/* Sidebar headings */
+
 .search-panel h2 {
   margin: 0;
+
   color: var(--color-text);
+
   font-size: 1.1rem;
   font-weight: 600;
 }
+
+/* ========================================
+   7. SEARCH FORM
+======================================== */
 
 .search-panel .search-form {
   display: grid;
@@ -117,51 +231,74 @@ body {
   font-size: 0.9rem;
 }
 
-/* Make the search field comfortable to read and operate. */
+/* Search input and button layout */
+
 .search-panel .search-input-group {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.75rem;
 }
 
-/* Stack the search controls when the available screen width is narrow. */
+/* Stack search controls on narrow screens */
+
 @media (max-width: 420px) {
   .search-panel .search-input-group {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
+/* Search input */
+
 .search-panel .search-input-group input {
   width: 100%;
   min-width: 0;
+
   padding: 0.85rem 1rem;
+
   border: 1px solid var(--color-glass-border);
   border-radius: 12px;
+
   background: var(--color-glass);
   color: var(--color-text);
+
   font: inherit;
-  transition: border-color var(--transition), background-color var(--transition);
+
+  transition:
+    border-color var(--transition),
+    background-color var(--transition);
 }
 
 .search-panel .search-input-group input::placeholder {
   color: var(--color-text-muted);
 }
 
+/* Search and location buttons */
+
 .search-panel .search-input-group button,
 .search-panel .location-button {
   min-height: 46px;
   padding: 0.75rem 1rem;
+
   border: 1px solid transparent;
   border-radius: 12px;
+
   font: inherit;
   font-weight: 600;
+
   cursor: pointer;
-  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
 }
+
+/* Search button */
 
 .search-panel .search-input-group button {
   background: var(--color-accent);
   color: var(--color-background-dark);
+
   transition:
     background-color var(--transition),
     border-color var(--transition),
@@ -175,13 +312,18 @@ body {
   transform: translateY(-1px);
 }
 
-/* Keep the location action distinct while matching the glass panels. */
+/* ========================================
+   8. CURRENT LOCATION BUTTON
+======================================== */
+
 .search-panel .location-button {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
+
   border-color: var(--color-glass-border);
+
   background: var(--color-glass);
   color: var(--color-text);
 }
@@ -190,37 +332,84 @@ body {
   border-color: var(--color-accent);
 }
 
-/* Show a consistent, high-visibility focus ring for keyboard users. */
+/* ========================================
+   9. ACCESSIBILITY AND FOCUS STATES
+======================================== */
+
 .search-panel .search-input-group input:focus-visible,
 .search-panel .search-input-group button:focus-visible,
 .search-panel .location-button:focus-visible {
   border-color: var(--color-accent);
+
   outline: 3px solid var(--color-accent);
   outline-offset: 3px;
 }
+
+/* Search error message */
 
 .search-panel .search-error {
   margin: 0;
   color: var(--color-text-muted);
 }
 
-/* Present recent cities as a tidy list of readable glass items. */
+/* ========================================
+   10. RECENT SEARCHES
+======================================== */
+
 .search-panel .recent-searches ul {
   display: grid;
   gap: 0.6rem;
+
   margin: 0;
   padding: 0;
+
   list-style: none;
 }
 
 .search-panel .recent-searches li {
   padding: 0.75rem 1rem;
+
   border: 1px solid var(--color-glass-border);
   border-radius: 12px;
+
   background: var(--color-glass);
   color: var(--color-text);
 }
 
 .search-panel .recent-searches .empty-history {
   color: var(--color-text-muted);
+}
+
+/* ========================================
+   11. RESPONSIVE VERDANT BRANDING
+======================================== */
+
+@media (max-width: 480px) {
+  .brand-lockup {
+    gap: 0.8rem;
+  }
+
+  .brand-logo {
+    width: 66px;
+    height: 66px;
+  }
+
+  .brand-logo svg {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* ========================================
+   12. REDUCED MOTION ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo {
+    transition: none;
+  }
+
+  .brand-logo:hover {
+    transform: none;
+  }
 }
