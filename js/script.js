@@ -13,6 +13,7 @@ const searchForm = document.getElementById("search-form");
 const cityInput = document.getElementById("city-search");
 const searchButton = document.getElementById("search-button");
 const searchError = document.getElementById("search-error");
+const locationButton = document.getElementById("location-button");
 
 const currentCity = document.getElementById("current-city");
 const currentDate = document.getElementById("current-date");
@@ -156,3 +157,105 @@ async function getWeather(city) {
   // 10. Update status
   weatherStatus.textContent = "Weather updated successfully";
 }
+// 11. GET WEATHER USING CURRENT LOCATION
+
+locationButton.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    searchError.textContent =
+      "Your browser does not support location services.";
+    return;
+  }
+
+  searchError.textContent = "";
+  weatherStatus.textContent = "Getting your current location...";
+
+  locationButton.disabled = true;
+  locationButton.textContent = "Getting location...";
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      try {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
+
+        const response = await fetch(weatherURL);
+        const weatherData = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            weatherData.message || "Unable to retrieve your local weather.",
+          );
+        }
+
+        // Display the current location's weather
+        currentCity.textContent = `${weatherData.name}, ${weatherData.sys.country}`;
+
+        currentDate.textContent = new Date().toLocaleDateString("en-KE", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+
+        currentTemp.textContent = `${Math.round(weatherData.main.temp)}°`;
+
+        weatherDescription.textContent = weatherData.weather[0].description;
+
+        feelsLike.textContent = `${Math.round(weatherData.main.feels_like)}°`;
+
+        humidity.textContent = `${weatherData.main.humidity}%`;
+
+        windSpeed.textContent = `${(weatherData.wind.speed * 3.6).toFixed(1)} km/h`;
+
+        const iconCode = weatherData.weather[0].icon;
+        const iconImage = document.createElement("img");
+
+        iconImage.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+        iconImage.alt = weatherData.weather[0].description;
+        iconImage.width = 100;
+        iconImage.height = 100;
+
+        weatherIcon.replaceChildren(iconImage);
+
+        weatherStatus.textContent =
+          "Weather updated using your current location.";
+      } catch (error) {
+        searchError.textContent = error.message;
+        weatherStatus.textContent = "Unable to load local weather.";
+      } finally {
+        locationButton.disabled = false;
+        locationButton.textContent = "Use My Current Location";
+      }
+    },
+
+    (error) => {
+      if (error.code === 1) {
+        searchError.textContent =
+          "Location permission denied. Please allow location access in your browser.";
+      } else if (error.code === 2) {
+        searchError.textContent =
+          "Your current location could not be determined.";
+      } else if (error.code === 3) {
+        searchError.textContent =
+          "Location request timed out. Please try again.";
+      } else {
+        searchError.textContent =
+          "Something went wrong while accessing your location.";
+      }
+
+      weatherStatus.textContent = "Location unavailable.";
+
+      locationButton.disabled = false;
+      locationButton.textContent = "Use My Current Location";
+    },
+
+    {
+      enableHighAccuracy: false,
+      timeout: 30000,
+      maximumAge: 600000,
+    },
+  );
+});
