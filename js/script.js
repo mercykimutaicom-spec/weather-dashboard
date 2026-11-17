@@ -29,7 +29,106 @@ const windSpeed = document.getElementById("wind-speed");
 const forecastList = document.getElementById("forecast-list");
 const forecastStatus = document.getElementById("forecast-status");
 let forecastRequestId = 0;
+let lastForecastCoordinates = null;
 let searchRequestActive = false;
+
+class WeatherRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "WeatherRequestError";
+  }
+}
+
+function getApiErrorMessage(status, requestType) {
+  if (status === 400) {
+    if (requestType === "geocoding") {
+      return "Please check the city name and try again.";
+    }
+
+    return "The weather service couldn't process this request. Please try again.";
+  }
+
+  if (status === 401) {
+    return "The weather service couldn't verify its API credentials. The dashboard's API configuration may need attention.";
+  }
+
+  if (status === 404) {
+    if (requestType === "geocoding") {
+      return "We couldn't find that city. Check the spelling and try again.";
+    }
+
+    if (requestType === "forecast") {
+      return "Forecast data isn't available for this location right now.";
+    }
+
+    return "Weather data isn't available for this location right now.";
+  }
+
+  if (status === 429) {
+    return "The weather service is busy. Please wait a moment and try again.";
+  }
+
+  if ([500, 502, 503].includes(status)) {
+    return "The weather service is temporarily unavailable. Please try again shortly.";
+  }
+
+  return "We couldn't retrieve weather information. Please try again.";
+}
+
+async function fetchWeatherData(url, requestType) {
+  let response;
+
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new WeatherRequestError(
+      "We couldn't connect to the weather service. Check your internet connection and try again.",
+    );
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new WeatherRequestError(
+      "The weather service returned an unreadable response. Please try again.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new WeatherRequestError(
+      getApiErrorMessage(response.status, requestType),
+    );
+  }
+
+  return data;
+}
+
+function validateCurrentWeather(data, requireLocationName = false) {
+  if (
+    !data ||
+    !data.main ||
+    !Number.isFinite(data.main.temp) ||
+    !Number.isFinite(data.main.feels_like) ||
+    !Number.isFinite(data.main.humidity) ||
+    !Array.isArray(data.weather) ||
+    !data.weather[0] ||
+    typeof data.weather[0].description !== "string" ||
+    typeof data.weather[0].icon !== "string" ||
+    !data.wind ||
+    !Number.isFinite(data.wind.speed) ||
+    (requireLocationName &&
+      (!data.name || !data.sys || typeof data.sys.country !== "string"))
+  ) {
+    throw new WeatherRequestError(
+      "Weather data was incomplete. Please try again.",
+    );
+  }
+}
+
+function getFriendlyErrorMessage(error, fallback) {
+  return error instanceof WeatherRequestError ? error.message : fallback;
+}
 
 // 3. SEARCH FORM EVENT
 
@@ -66,7 +165,10 @@ searchForm.addEventListener("submit", async (event) => {
     // Save the city to recent searches after successful weather fetch
     saveRecentCity(city);
   } catch (error) {
-    searchError.textContent = error.message;
+    searchError.textContent = getFriendlyErrorMessage(
+      error,
+      "We couldn't load weather for that search. Please try again.",
+    );
     weatherStatus.textContent = "Unable to load weather";
   } finally {
     searchRequestActive = false;
@@ -231,29 +333,21 @@ async function getWeather(city) {
   // 1. Find the city's geographical coordinates
   const geocodingURL = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`;
 
-  const locationResponse = await fetch(geocodingURL);
-  const locations = await locationResponse.json();
-
-  // 2. Identify geocoding errors correctly
-  if (!locationResponse.ok) {
-    if (locationResponse.status === 401) {
-      throw new Error(
-        "Invalid or inactive API key. Check your OpenWeatherMap account.",
-      );
-    }
-
-    if (locationResponse.status === 429) {
-      throw new Error("Too many requests. Please wait before trying again.");
-    }
-
-    throw new Error(
-      `Location request failed: ${locations.message || locationResponse.status}`,
-    );
-  }
+  const locations = await fetchWeatherData(geocodingURL, "geocoding");
 
   // 3. Check whether the city exists
-  if (!locations || locations.length === 0) {
-    throw new Error("City not found. Try entering Nairobi,KE.");
+  if (
+    !Array.isArray(locations) ||
+    locations.length === 0 ||
+    !locations[0] ||
+    !Number.isFinite(locations[0].lat) ||
+    !Number.isFinite(locations[0].lon) ||
+    !locations[0].name ||
+    typeof locations[0].country !== "string"
+  ) {
+    throw new WeatherRequestError(
+      "We couldn't find that city. Check the spelling and try again.",
+    );
   }
 
   const latitude = locations[0].lat;
@@ -265,23 +359,8 @@ async function getWeather(city) {
   // 4. Fetch current weather
   const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
 
-  const weatherResponse = await fetch(weatherURL);
-  const weatherData = await weatherResponse.json();
-
-  // 5. Handle weather API errors
-  if (!weatherResponse.ok) {
-    if (weatherResponse.status === 401) {
-      throw new Error("Your API key is invalid or inactive.");
-    }
-
-    if (weatherResponse.status === 429) {
-      throw new Error("Weather API request limit exceeded.");
-    }
-
-    throw new Error(
-      weatherData.message || "Unable to retrieve weather information.",
-    );
-  }
+  const weatherData = await fetchWeatherData(weatherURL, "current");
+  validateCurrentWeather(weatherData);
 
   // 6. Update city information
   currentCity.textContent = `${cityName}, ${country}`;
@@ -329,6 +408,7 @@ async function getWeather(city) {
  * Forecast failures are shown in the forecast card without affecting current weather.
  */
 async function loadForecast(latitude, longitude) {
+  lastForecastCoordinates = { latitude, longitude };
   const requestId = ++forecastRequestId;
 
   try {
@@ -338,18 +418,13 @@ async function loadForecast(latitude, longitude) {
     renderForecastMessage("Loading forecast data...");
 
     const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
-    const response = await fetch(forecastURL);
-    const forecastData = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        forecastData.message || `Forecast request failed (${response.status}).`,
-      );
-    }
+    const forecastData = await fetchWeatherData(forecastURL, "forecast");
 
     const timezoneOffset = forecastData.city && forecastData.city.timezone;
     if (!Number.isFinite(timezoneOffset) || !Array.isArray(forecastData.list)) {
-      throw new Error("Forecast data is incomplete.");
+      throw new WeatherRequestError(
+        "Forecast data was incomplete. Please try again.",
+      );
     }
 
     const days = getNextForecastDays(forecastData.list, timezoneOffset);
@@ -361,6 +436,7 @@ async function loadForecast(latitude, longitude) {
       forecastStatus.textContent = "Forecast unavailable";
       renderForecastMessage(
         "A three-day forecast is not available for this location yet.",
+        { isError: true, retry: true },
       );
       return;
     }
@@ -375,7 +451,11 @@ async function loadForecast(latitude, longitude) {
     console.warn("Failed to load weather forecast", error);
     forecastStatus.textContent = "Forecast unavailable";
     renderForecastMessage(
-      "The forecast couldn't be loaded. Please try again later.",
+      getFriendlyErrorMessage(
+        error,
+        "The forecast couldn't be loaded. Please try again.",
+      ),
+      { isError: true, retry: true },
     );
   } finally {
     if (requestId === forecastRequestId) {
@@ -521,10 +601,30 @@ function createForecastTemperature(label, temperature) {
   return item;
 }
 
-function renderForecastMessage(message) {
-  const item = document.createElement("p");
-  item.className = "forecast-message";
-  item.textContent = message;
+function renderForecastMessage(message, options = {}) {
+  const item = document.createElement("div");
+  item.className = options.isError
+    ? "forecast-message is-error"
+    : "forecast-message";
+
+  const messageText = document.createElement("p");
+  messageText.textContent = message;
+  item.appendChild(messageText);
+
+  if (options.retry && lastForecastCoordinates) {
+    const retryButton = document.createElement("button");
+    retryButton.type = "button";
+    retryButton.className = "forecast-retry";
+    retryButton.textContent = "Retry forecast";
+
+    const { latitude, longitude } = lastForecastCoordinates;
+    retryButton.addEventListener("click", () => {
+      loadForecast(latitude, longitude);
+    });
+
+    item.appendChild(retryButton);
+  }
+
   forecastList.replaceChildren(item);
 }
 
@@ -533,7 +633,7 @@ function renderForecastMessage(message) {
 locationButton.addEventListener("click", () => {
   if (!navigator.geolocation) {
     searchError.textContent =
-      "Your browser does not support location services.";
+      "This browser doesn't support location services. You can search for a city instead.";
     return;
   }
 
@@ -555,14 +655,8 @@ locationButton.addEventListener("click", () => {
 
         const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
 
-        const response = await fetch(weatherURL);
-        const weatherData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            weatherData.message || "Unable to retrieve your local weather.",
-          );
-        }
+        const weatherData = await fetchWeatherData(weatherURL, "current");
+        validateCurrentWeather(weatherData, true);
 
         // Display the current location's weather
         currentCity.textContent = `${weatherData.name}, ${weatherData.sys.country}`;
@@ -600,7 +694,10 @@ locationButton.addEventListener("click", () => {
 
         loadForecast(latitude, longitude);
       } catch (error) {
-        searchError.textContent = error.message;
+        searchError.textContent = getFriendlyErrorMessage(
+          error,
+          "We couldn't load your local weather. Please try again.",
+        );
         weatherStatus.textContent = "Unable to load local weather.";
       } finally {
         locationButton.disabled = false;
@@ -612,13 +709,13 @@ locationButton.addEventListener("click", () => {
     (error) => {
       if (error.code === 1) {
         searchError.textContent =
-          "Location permission denied. Please allow location access in your browser.";
+          "Location permission denied. Allow location access in your browser settings, then try again.";
       } else if (error.code === 2) {
         searchError.textContent =
-          "Your current location could not be determined.";
+          "Your location couldn't be determined. Check that location services are enabled and try again.";
       } else if (error.code === 3) {
         searchError.textContent =
-          "Location request timed out. Please try again.";
+          "The location request timed out. Check location services and try again.";
       } else {
         searchError.textContent =
           "Something went wrong while accessing your location.";
