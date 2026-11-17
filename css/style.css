@@ -9,10 +9,12 @@
   --color-vanilla-cream: #FFF9EA;
   --color-lavender-accent: #B9A8E8;
   --color-golden-accent: #D8A94D;
+  --color-cloud-blue: #EDF2FA;
+  --color-ambient-lavender: #E9E2F7;
   --color-main-text: #29233F;
   --color-muted-text: #777184;
 
-  --color-background: var(--color-cream-soda);
+  --color-background: var(--color-cloud-blue);
   --color-background-alt: var(--color-vanilla-cream);
   --color-primary-text: var(--color-main-text);
   --color-secondary-text: var(--color-muted-text);
@@ -43,7 +45,19 @@ body {
   padding: clamp(1rem, 3vw, 2.5rem);
   font-family: "Inter", Arial, sans-serif;
   color: var(--color-primary-text);
-  background: var(--color-background);
+  background-color: var(--color-background);
+  background-image:
+    radial-gradient(
+      ellipse 34rem 26rem at 5% 8%,
+      var(--color-ambient-lavender) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 30rem 24rem at 96% 88%,
+      var(--color-ambient-lavender) 0%,
+      transparent 100%
+    );
+  background-repeat: no-repeat;
 }
 
 /* ========================================
@@ -554,6 +568,20 @@ body {
 }
 
 @media (max-width: 680px) {
+  body {
+    background-image:
+      radial-gradient(
+        ellipse 21rem 17rem at 0% 3%,
+        var(--color-ambient-lavender) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        ellipse 19rem 16rem at 100% 96%,
+        var(--color-ambient-lavender) 0%,
+        transparent 100%
+      );
+  }
+
   .weather-display {
     grid-template-columns: minmax(0, 1fr);
   }
