@@ -52,6 +52,9 @@ searchForm.addEventListener("submit", async (event) => {
     weatherStatus.textContent = "Fetching weather data...";
 
     await getWeather(city);
+
+    // Save the city to recent searches after successful weather fetch
+    saveRecentCity(city);
   } catch (error) {
     searchError.textContent = error.message;
     weatherStatus.textContent = "Unable to load weather";
@@ -60,6 +63,155 @@ searchForm.addEventListener("submit", async (event) => {
     searchButton.textContent = "Search";
   }
 });
+
+// 5. RECENT SEARCHES MANAGEMENT
+
+/**
+ * Load recent cities from localStorage.
+ * Returns an array of city names, or an empty array if data is invalid.
+ */
+function loadRecentCities() {
+  try {
+    const stored = localStorage.getItem("verdant-recent-cities");
+    if (!stored) {
+      return [];
+    }
+    const cities = JSON.parse(stored);
+
+    // Validate that the stored data is an array of strings
+    if (!Array.isArray(cities)) {
+      return [];
+    }
+
+    const uniqueCities = [];
+    const seenCities = new Set();
+
+    for (const city of cities) {
+      if (typeof city !== "string") {
+        continue;
+      }
+
+      const cityName = city.trim();
+      const normalizedCity = cityName.toLowerCase();
+
+      if (!cityName || seenCities.has(normalizedCity)) {
+        continue;
+      }
+
+      seenCities.add(normalizedCity);
+      uniqueCities.push(cityName);
+
+      if (uniqueCities.length === 5) {
+        break;
+      }
+    }
+
+    return uniqueCities;
+  } catch (error) {
+    // If localStorage data is corrupted or unparseable, return empty array
+    console.warn("Failed to load recent cities from localStorage", error);
+    return [];
+  }
+}
+
+/**
+ * Save a city to recent searches in localStorage.
+ * Prevents duplicate entries (case-insensitive).
+ * Keeps maximum of 5 cities, with most recent first.
+ * @param {string} city - The city name to save
+ */
+function saveRecentCity(city) {
+  const cities = loadRecentCities();
+
+  // Normalize for case-insensitive comparison
+  const cityName = city.trim();
+  if (!cityName) {
+    return;
+  }
+
+  const normalizedCity = cityName.toLowerCase();
+  const existingCity = cities.find(
+    (savedCity) => savedCity.toLowerCase() === normalizedCity,
+  );
+  const updatedCities = [
+    existingCity || cityName,
+    ...cities.filter((savedCity) => savedCity.toLowerCase() !== normalizedCity),
+  ].slice(0, 5);
+
+  saveCitiesToStorage(updatedCities);
+  renderRecentCities();
+}
+
+/**
+ * Save cities array to localStorage.
+ * @param {string[]} cities - Array of city names
+ */
+function saveCitiesToStorage(cities) {
+  try {
+    localStorage.setItem("verdant-recent-cities", JSON.stringify(cities));
+  } catch (error) {
+    console.warn("Failed to save recent cities to localStorage", error);
+  }
+}
+
+/**
+ * Render recent cities in the #recent-cities list.
+ * Supports keyboard accessibility (Enter/Space) via role="button" and tabindex.
+ */
+function renderRecentCities() {
+  const recentCitiesList = document.getElementById("recent-cities");
+
+  if (!recentCitiesList) {
+    return;
+  }
+
+  recentCitiesList.replaceChildren();
+  const cities = loadRecentCities();
+
+  if (cities.length === 0) {
+    const emptyItem = document.createElement("li");
+    emptyItem.className = "empty-history";
+    emptyItem.textContent = "Your recent cities will appear here.";
+    recentCitiesList.appendChild(emptyItem);
+    return;
+  }
+
+  // Render each city (most recent first)
+  cities.forEach((city) => {
+    const listItem = document.createElement("li");
+    listItem.role = "button";
+    listItem.tabIndex = 0;
+    listItem.textContent = city;
+
+    // Click event - search for this city
+    listItem.addEventListener("click", () => {
+      searchCity(city);
+    });
+
+    // Keyboard accessibility: Enter and Space
+    listItem.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        searchCity(city);
+      }
+    });
+
+    recentCitiesList.appendChild(listItem);
+  });
+}
+
+/**
+ * Search for a city's weather by triggering the search mechanism.
+ * @param {string} city - The city name to search for
+ */
+function searchCity(city) {
+  // Set the input value and dispatch submit event
+  cityInput.value = city;
+  searchForm.dispatchEvent(new Event("submit", { bubbles: true }));
+}
+
+// Initialize recent searches when dashboard loads
+renderRecentCities();
 
 // 4. GET CITY COORDINATES
 
