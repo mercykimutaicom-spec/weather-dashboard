@@ -19,6 +19,7 @@ const currentCity = document.getElementById("current-city");
 const currentDate = document.getElementById("current-date");
 const weatherStatus = document.getElementById("weather-status");
 
+const weatherOverview = document.querySelector(".weather-overview");
 const weatherIcon = document.getElementById("weather-icon");
 const currentTemp = document.getElementById("current-temp");
 const weatherDescription = document.getElementById("weather-description");
@@ -132,6 +133,46 @@ function validateCurrentWeather(data, requireLocationName = false) {
 
 function getFriendlyErrorMessage(error, fallback) {
   return error instanceof WeatherRequestError ? error.message : fallback;
+} // Apply a visual theme based on the current weather condition
+function updateWeatherTheme(data) {
+  const conditionCode = data.weather[0].id;
+  const iconCode = data.weather[0].icon;
+
+  let condition = "clouds";
+
+  if (conditionCode >= 200 && conditionCode < 300) {
+    condition = "thunderstorm";
+  } else if (conditionCode >= 300 && conditionCode < 600) {
+    condition = "rain";
+  } else if (conditionCode >= 600 && conditionCode < 700) {
+    condition = "snow";
+  } else if (conditionCode >= 700 && conditionCode < 800) {
+    condition = "atmosphere";
+  } else if (conditionCode === 800) {
+    condition = "clear";
+  } else if (conditionCode > 800 && conditionCode < 900) {
+    condition = "clouds";
+  }
+
+  // Remove the previous weather theme
+  weatherOverview.classList.remove(
+    "weather-clear",
+    "weather-clouds",
+    "weather-rain",
+    "weather-snow",
+    "weather-thunderstorm",
+    "weather-atmosphere",
+    "weather-day",
+    "weather-night",
+  );
+
+  // Apply the new weather theme
+  weatherOverview.classList.add(`weather-${condition}`);
+
+  // Detect daytime or nighttime using the API icon code
+  const timeOfDay = iconCode.endsWith("n") ? "night" : "day";
+
+  weatherOverview.classList.add(`weather-${timeOfDay}`);
 }
 // Update all weather detail cards
 function updateWeatherDetails(data) {
@@ -405,7 +446,7 @@ async function getWeather(city) {
 
   const weatherData = await fetchWeatherData(weatherURL, "current");
   validateCurrentWeather(weatherData);
-
+  updateWeatherTheme(weatherData);
   // 6. Update city information
   currentCity.textContent = `${cityName}, ${country}`;
 
@@ -692,7 +733,7 @@ locationButton.addEventListener("click", () => {
 
         const weatherData = await fetchWeatherData(weatherURL, "current");
         validateCurrentWeather(weatherData, true);
-
+        updateWeatherTheme(weatherData);
         // Display the current location's weather
         currentCity.textContent = `${weatherData.name}, ${weatherData.sys.country}`;
 
