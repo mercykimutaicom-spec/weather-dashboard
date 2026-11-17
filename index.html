@@ -267,39 +267,22 @@
               <p class="section-label">COMING UP</p>
               <h3 id="forecast-heading">3-Day Forecast</h3>
             </div>
-            <span class="forecast-status">Forecast pending</span>
+            <span
+              class="forecast-status"
+              id="forecast-status"
+              role="status"
+              aria-live="polite"
+            >
+              Forecast pending
+            </span>
           </header>
 
-          <div class="forecast-list" id="forecast-list">
-            <article class="forecast-card">
-              <p class="forecast-day">Day 1</p>
-              <span class="forecast-icon" aria-hidden="true">—</span>
-              <p class="forecast-condition">Condition unavailable</p>
-              <div class="forecast-temperatures">
-                <p>High <strong>--°</strong></p>
-                <p>Low <strong>--°</strong></p>
-              </div>
-            </article>
-
-            <article class="forecast-card">
-              <p class="forecast-day">Day 2</p>
-              <span class="forecast-icon" aria-hidden="true">—</span>
-              <p class="forecast-condition">Condition unavailable</p>
-              <div class="forecast-temperatures">
-                <p>High <strong>--°</strong></p>
-                <p>Low <strong>--°</strong></p>
-              </div>
-            </article>
-
-            <article class="forecast-card">
-              <p class="forecast-day">Day 3</p>
-              <span class="forecast-icon" aria-hidden="true">—</span>
-              <p class="forecast-condition">Condition unavailable</p>
-              <div class="forecast-temperatures">
-                <p>High <strong>--°</strong></p>
-                <p>Low <strong>--°</strong></p>
-              </div>
-            </article>
+          <div
+            class="forecast-list"
+            id="forecast-list"
+            aria-busy="false"
+          >
+            <p class="forecast-message">Search for a city to see its forecast.</p>
           </div>
 
           <details class="card-disclosure">

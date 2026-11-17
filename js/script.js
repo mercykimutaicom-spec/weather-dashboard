@@ -26,6 +26,9 @@ const feelsLike = document.getElementById("feels-like");
 
 const humidity = document.getElementById("humidity");
 const windSpeed = document.getElementById("wind-speed");
+const forecastList = document.getElementById("forecast-list");
+const forecastStatus = document.getElementById("forecast-status");
+let forecastRequestId = 0;
 
 // 3. SEARCH FORM EVENT
 
@@ -308,7 +311,212 @@ async function getWeather(city) {
 
   // 10. Update status
   weatherStatus.textContent = "Weather updated successfully";
+
+  loadForecast(latitude, longitude);
 }
+
+/**
+ * Load and render the next three local calendar days of forecast data.
+ * Forecast failures are shown in the forecast card without affecting current weather.
+ */
+async function loadForecast(latitude, longitude) {
+  const requestId = ++forecastRequestId;
+
+  try {
+    forecastStatus.textContent = "Loading forecast...";
+    forecastList.setAttribute("aria-busy", "true");
+    renderForecastMessage("Loading forecast data...");
+
+    const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
+    const response = await fetch(forecastURL);
+    const forecastData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        forecastData.message || `Forecast request failed (${response.status}).`,
+      );
+    }
+
+    const timezoneOffset = forecastData.city && forecastData.city.timezone;
+    if (!Number.isFinite(timezoneOffset) || !Array.isArray(forecastData.list)) {
+      throw new Error("Forecast data is incomplete.");
+    }
+
+    const days = getNextForecastDays(forecastData.list, timezoneOffset);
+    if (requestId !== forecastRequestId) {
+      return;
+    }
+
+    if (days.length < 3) {
+      forecastStatus.textContent = "Forecast unavailable";
+      renderForecastMessage(
+        "A three-day forecast is not available for this location yet.",
+      );
+      return;
+    }
+
+    renderForecast(days);
+    forecastStatus.textContent = "Next 3 days";
+  } catch (error) {
+    if (requestId !== forecastRequestId) {
+      return;
+    }
+
+    console.warn("Failed to load weather forecast", error);
+    forecastStatus.textContent = "Forecast unavailable";
+    renderForecastMessage(
+      "The forecast couldn't be loaded. Please try again later.",
+    );
+  } finally {
+    if (requestId === forecastRequestId) {
+      forecastList.setAttribute("aria-busy", "false");
+    }
+  }
+}
+
+function getNextForecastDays(entries, timezoneOffset) {
+  const today = getForecastDateKey(Date.now() / 1000, timezoneOffset);
+  const groupedDays = new Map();
+
+  entries.forEach((entry) => {
+    if (
+      !entry ||
+      !Number.isFinite(entry.dt) ||
+      !entry.main ||
+      !Number.isFinite(entry.main.temp_min) ||
+      !Number.isFinite(entry.main.temp_max)
+    ) {
+      return;
+    }
+
+    const date = getForecastDateKey(entry.dt, timezoneOffset);
+    if (date <= today) {
+      return;
+    }
+
+    let day = groupedDays.get(date);
+    if (!day) {
+      day = {
+        date,
+        min: entry.main.temp_min,
+        max: entry.main.temp_max,
+        entries: [],
+      };
+      groupedDays.set(date, day);
+    } else {
+      day.min = Math.min(day.min, entry.main.temp_min);
+      day.max = Math.max(day.max, entry.main.temp_max);
+    }
+
+    day.entries.push(entry);
+  });
+
+  return [...groupedDays.values()]
+    .sort((first, second) => first.date.localeCompare(second.date))
+    .slice(0, 3)
+    .map((day) => {
+      const representative = day.entries.reduce((closest, entry) => {
+        const hour = new Date(
+          (entry.dt + timezoneOffset) * 1000,
+        ).getUTCHours();
+        const closestHour = new Date(
+          (closest.dt + timezoneOffset) * 1000,
+        ).getUTCHours();
+
+        return Math.abs(hour - 12) < Math.abs(closestHour - 12)
+          ? entry
+          : closest;
+      });
+      const condition =
+        representative.weather && representative.weather[0]
+          ? representative.weather[0]
+          : {};
+
+      return {
+        ...day,
+        description: condition.description || "Conditions unavailable",
+        icon: condition.icon || "",
+      };
+    });
+}
+
+function getForecastDateKey(timestamp, timezoneOffset) {
+  const date = new Date((timestamp + timezoneOffset) * 1000);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function renderForecast(days) {
+  const fragment = document.createDocumentFragment();
+
+  days.forEach((day) => {
+    const card = document.createElement("article");
+    card.className = "forecast-card";
+
+    const weekday = document.createElement("p");
+    weekday.className = "forecast-day";
+    weekday.textContent = new Intl.DateTimeFormat(undefined, {
+      weekday: "long",
+      timeZone: "UTC",
+    }).format(new Date(`${day.date}T12:00:00Z`));
+    card.appendChild(weekday);
+
+    const icon = document.createElement("span");
+    icon.className = "forecast-icon";
+    icon.setAttribute("aria-hidden", "true");
+    if (day.icon) {
+      const image = document.createElement("img");
+      image.src = `https://openweathermap.org/img/wn/${encodeURIComponent(day.icon)}@2x.png`;
+      image.alt = "";
+      image.width = 64;
+      image.height = 64;
+      image.loading = "lazy";
+      icon.appendChild(image);
+    } else {
+      icon.textContent = "—";
+    }
+    card.appendChild(icon);
+
+    const description = document.createElement("p");
+    description.className = "forecast-condition";
+    description.textContent = day.description;
+    card.appendChild(description);
+
+    const temperatures = document.createElement("div");
+    temperatures.className = "forecast-temperatures";
+    temperatures.appendChild(
+      createForecastTemperature("Low", day.min),
+    );
+    temperatures.appendChild(
+      createForecastTemperature("High", day.max),
+    );
+    card.appendChild(temperatures);
+
+    fragment.appendChild(card);
+  });
+
+  forecastList.replaceChildren(fragment);
+}
+
+function createForecastTemperature(label, temperature) {
+  const item = document.createElement("p");
+  item.append(`${label} `);
+
+  const value = document.createElement("strong");
+  value.textContent = `${Math.round(temperature)}°`;
+  item.appendChild(value);
+  return item;
+}
+
+function renderForecastMessage(message) {
+  const item = document.createElement("p");
+  item.className = "forecast-message";
+  item.textContent = message;
+  forecastList.replaceChildren(item);
+}
+
 // 11. GET WEATHER USING CURRENT LOCATION
 
 locationButton.addEventListener("click", () => {
@@ -374,6 +582,8 @@ locationButton.addEventListener("click", () => {
 
         weatherStatus.textContent =
           "Weather updated using your current location.";
+
+        loadForecast(latitude, longitude);
       } catch (error) {
         searchError.textContent = error.message;
         weatherStatus.textContent = "Unable to load local weather.";
