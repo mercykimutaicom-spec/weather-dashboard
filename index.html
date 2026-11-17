@@ -32,7 +32,6 @@
         <!-- VERDANT BRAND -->
         <div class="app-brand">
           <div class="brand-lockup">
-            <!-- Realistic Cloud Logo -->
             <div class="brand-logo" aria-hidden="true">
               <svg
                 viewBox="0 0 100 100"
@@ -75,7 +74,6 @@
                   </filter>
                 </defs>
 
-                <!-- Cloud shadow -->
                 <ellipse
                   cx="51"
                   cy="72"
@@ -86,7 +84,6 @@
                   filter="url(#cloudShadow)"
                 />
 
-                <!-- Main cloud -->
                 <path
                   d="M27 68
                      C17 68 12 61 12 53
@@ -99,7 +96,6 @@
                   fill="url(#cloudGradient)"
                 />
 
-                <!-- Cloud highlight -->
                 <path
                   d="M23 48
                      C25 36 34 27 46 26
@@ -110,7 +106,6 @@
                   stroke-linecap="round"
                 />
 
-                <!-- Cloud shading -->
                 <path
                   d="M27 62 C42 68 66 68 80 62"
                   fill="none"
@@ -122,7 +117,6 @@
               </svg>
             </div>
 
-            <!-- Brand Name and Tagline -->
             <div class="brand-copy">
               <h1>Verdant</h1>
               <p>See beyond the forecast.</p>
@@ -174,7 +168,10 @@
       </aside>
 
       <!-- RIGHT WEATHER DISPLAY -->
-      <section class="weather-display glass-panel" aria-label="Weather dashboard">
+      <section
+        class="weather-display glass-panel"
+        aria-label="Weather dashboard"
+      >
         <!-- WEATHER OVERVIEW -->
         <section
           class="weather-overview bento-card"
@@ -217,7 +214,9 @@
 
           <details class="card-disclosure">
             <summary>About these conditions</summary>
-            <p>Temperatures are shown in metric units for your selected location.</p>
+            <p>
+              Temperatures are shown in metric units for your selected location.
+            </p>
           </details>
         </section>
 
@@ -228,12 +227,14 @@
         >
           <header class="card-heading">
             <span class="insight-icon" aria-hidden="true">°</span>
+
             <div>
               <p class="section-label">LOCAL CONDITIONS</p>
               <h3 id="insights-heading">Today's Insights</h3>
             </div>
           </header>
 
+          <!-- WEATHER DETAIL CARDS -->
           <div class="details-grid">
             <article class="detail-card">
               <p>Humidity</p>
@@ -244,16 +245,45 @@
               <p>Wind Speed</p>
               <h4 id="wind-speed">-- km/h</h4>
             </article>
+
+            <article class="detail-card">
+              <p>Visibility</p>
+              <h4 id="visibility">-- km</h4>
+            </article>
+
+            <article class="detail-card">
+              <p>Atmospheric Pressure</p>
+              <h4 id="pressure">-- hPa</h4>
+            </article>
+
+            <article class="detail-card">
+              <p>Sunrise</p>
+              <h4 id="sunrise">--:--</h4>
+            </article>
+
+            <article class="detail-card">
+              <p>Sunset</p>
+              <h4 id="sunset">--:--</h4>
+            </article>
           </div>
 
           <div class="insight-note">
             <span aria-hidden="true">✦</span>
-            <p>Personalized weather guidance will appear here in a future update.</p>
+            <p>
+              Weather insights help you understand the conditions throughout
+              your day.
+            </p>
           </div>
 
           <details class="card-disclosure">
             <summary>About these readings</summary>
-            <p>Humidity and wind speed reflect the current conditions for the selected location.</p>
+            <p>
+              Humidity measures moisture in the air. Wind speed describes how
+              fast the air is moving. Visibility estimates how far you can see.
+              Atmospheric pressure measures the force exerted by the air.
+              Sunrise and sunset show the local times when the sun rises and
+              sets in your selected location.
+            </p>
           </details>
         </section>
 
@@ -267,6 +297,7 @@
               <p class="section-label">COMING UP</p>
               <h3 id="forecast-heading">3-Day Forecast</h3>
             </div>
+
             <span
               class="forecast-status"
               id="forecast-status"
@@ -277,17 +308,18 @@
             </span>
           </header>
 
-          <div
-            class="forecast-list"
-            id="forecast-list"
-            aria-busy="false"
-          >
-            <p class="forecast-message">Search for a city to see its forecast.</p>
+          <div class="forecast-list" id="forecast-list" aria-busy="false">
+            <p class="forecast-message">
+              Search for a city to see its forecast.
+            </p>
           </div>
 
           <details class="card-disclosure">
             <summary>About the forecast</summary>
-            <p>Forecast details will appear when forecast data is connected.</p>
+            <p>
+              Forecast details show expected weather conditions over the next
+              three days.
+            </p>
           </details>
         </section>
       </section>

@@ -26,6 +26,10 @@ const feelsLike = document.getElementById("feels-like");
 
 const humidity = document.getElementById("humidity");
 const windSpeed = document.getElementById("wind-speed");
+const visibility = document.getElementById("visibility");
+const pressure = document.getElementById("pressure");
+const sunrise = document.getElementById("sunrise");
+const sunset = document.getElementById("sunset");
 const forecastList = document.getElementById("forecast-list");
 const forecastStatus = document.getElementById("forecast-status");
 let forecastRequestId = 0;
@@ -128,6 +132,46 @@ function validateCurrentWeather(data, requireLocationName = false) {
 
 function getFriendlyErrorMessage(error, fallback) {
   return error instanceof WeatherRequestError ? error.message : fallback;
+}
+// Update all weather detail cards
+function updateWeatherDetails(data) {
+  // Humidity
+  humidity.textContent = `${data.main.humidity}%`;
+
+  // Wind speed: convert metres per second to kilometres per hour
+  windSpeed.textContent = `${(data.wind.speed * 3.6).toFixed(1)} km/h`;
+
+  // Visibility: convert metres to kilometres
+  visibility.textContent = Number.isFinite(data.visibility)
+    ? `${(data.visibility / 1000).toFixed(1)} km`
+    : "-- km";
+
+  // Atmospheric pressure
+  pressure.textContent = Number.isFinite(data.main.pressure)
+    ? `${data.main.pressure} hPa`
+    : "-- hPa";
+
+  // Convert Unix timestamps into the selected city's local time
+  function formatLocalTime(timestamp) {
+    if (!Number.isFinite(timestamp) || !Number.isFinite(data.timezone)) {
+      return "--:--";
+    }
+
+    const localDate = new Date((timestamp + data.timezone) * 1000);
+
+    let hours = localDate.getUTCHours();
+    const minutes = String(localDate.getUTCMinutes()).padStart(2, "0");
+
+    const period = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12;
+
+    return `${String(hours).padStart(2, "0")}:${minutes} ${period}`;
+  }
+
+  // Sunrise and sunset
+  sunrise.textContent = formatLocalTime(data.sys?.sunrise);
+  sunset.textContent = formatLocalTime(data.sys?.sunset);
 }
 
 // 3. SEARCH FORM EVENT
@@ -379,11 +423,8 @@ async function getWeather(city) {
 
   feelsLike.textContent = `${Math.round(weatherData.main.feels_like)}°`;
 
-  // 8. Update humidity and wind
-  humidity.textContent = `${weatherData.main.humidity}%`;
-
-  windSpeed.textContent = `${(weatherData.wind.speed * 3.6).toFixed(1)} km/h`;
-
+  // 8. Update all weather detail cards
+  updateWeatherDetails(weatherData);
   // 9. Update weather icon
   const iconCode = weatherData.weather[0].icon;
 
@@ -507,9 +548,7 @@ function getNextForecastDays(entries, timezoneOffset) {
     .slice(0, 3)
     .map((day) => {
       const representative = day.entries.reduce((closest, entry) => {
-        const hour = new Date(
-          (entry.dt + timezoneOffset) * 1000,
-        ).getUTCHours();
+        const hour = new Date((entry.dt + timezoneOffset) * 1000).getUTCHours();
         const closestHour = new Date(
           (closest.dt + timezoneOffset) * 1000,
         ).getUTCHours();
@@ -577,12 +616,8 @@ function renderForecast(days) {
 
     const temperatures = document.createElement("div");
     temperatures.className = "forecast-temperatures";
-    temperatures.appendChild(
-      createForecastTemperature("Low", day.min),
-    );
-    temperatures.appendChild(
-      createForecastTemperature("High", day.max),
-    );
+    temperatures.appendChild(createForecastTemperature("Low", day.min));
+    temperatures.appendChild(createForecastTemperature("High", day.max));
     card.appendChild(temperatures);
 
     fragment.appendChild(card);
@@ -674,9 +709,8 @@ locationButton.addEventListener("click", () => {
 
         feelsLike.textContent = `${Math.round(weatherData.main.feels_like)}°`;
 
-        humidity.textContent = `${weatherData.main.humidity}%`;
-
-        windSpeed.textContent = `${(weatherData.wind.speed * 3.6).toFixed(1)} km/h`;
+        // Update all weather detail cards
+        updateWeatherDetails(weatherData);
 
         const iconCode = weatherData.weather[0].icon;
         const iconImage = document.createElement("img");
