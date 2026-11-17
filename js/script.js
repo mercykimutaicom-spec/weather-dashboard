@@ -29,11 +29,16 @@ const windSpeed = document.getElementById("wind-speed");
 const forecastList = document.getElementById("forecast-list");
 const forecastStatus = document.getElementById("forecast-status");
 let forecastRequestId = 0;
+let searchRequestActive = false;
 
 // 3. SEARCH FORM EVENT
 
 searchForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (searchRequestActive) {
+    return;
+  }
 
   const city = cityInput.value.trim();
 
@@ -50,9 +55,11 @@ searchForm.addEventListener("submit", async (event) => {
   searchError.textContent = "";
 
   try {
+    searchRequestActive = true;
     searchButton.disabled = true;
-    searchButton.textContent = "Loading...";
-    weatherStatus.textContent = "Fetching weather data...";
+    searchButton.setAttribute("aria-busy", "true");
+    searchButton.textContent = "Searching...";
+    weatherStatus.textContent = "Finding your weather...";
 
     await getWeather(city);
 
@@ -62,7 +69,9 @@ searchForm.addEventListener("submit", async (event) => {
     searchError.textContent = error.message;
     weatherStatus.textContent = "Unable to load weather";
   } finally {
+    searchRequestActive = false;
     searchButton.disabled = false;
+    searchButton.setAttribute("aria-busy", "false");
     searchButton.textContent = "Search";
   }
 });
@@ -324,6 +333,7 @@ async function loadForecast(latitude, longitude) {
 
   try {
     forecastStatus.textContent = "Loading forecast...";
+    forecastStatus.setAttribute("aria-busy", "true");
     forecastList.setAttribute("aria-busy", "true");
     renderForecastMessage("Loading forecast data...");
 
@@ -369,6 +379,7 @@ async function loadForecast(latitude, longitude) {
     );
   } finally {
     if (requestId === forecastRequestId) {
+      forecastStatus.setAttribute("aria-busy", "false");
       forecastList.setAttribute("aria-busy", "false");
     }
   }
@@ -527,16 +538,20 @@ locationButton.addEventListener("click", () => {
   }
 
   searchError.textContent = "";
-  weatherStatus.textContent = "Getting your current location...";
+  weatherStatus.textContent = "Finding your location...";
 
   locationButton.disabled = true;
-  locationButton.textContent = "Getting location...";
+  locationButton.setAttribute("aria-busy", "true");
+  locationButton.textContent = "Finding location...";
 
   navigator.geolocation.getCurrentPosition(
     async (position) => {
       try {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
+
+        weatherStatus.textContent = "Loading your local weather...";
+        locationButton.textContent = "Loading weather...";
 
         const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
 
@@ -589,6 +604,7 @@ locationButton.addEventListener("click", () => {
         weatherStatus.textContent = "Unable to load local weather.";
       } finally {
         locationButton.disabled = false;
+        locationButton.setAttribute("aria-busy", "false");
         locationButton.textContent = "Use My Current Location";
       }
     },
@@ -611,6 +627,7 @@ locationButton.addEventListener("click", () => {
       weatherStatus.textContent = "Location unavailable.";
 
       locationButton.disabled = false;
+      locationButton.setAttribute("aria-busy", "false");
       locationButton.textContent = "Use My Current Location";
     },
 
