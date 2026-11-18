@@ -1,5 +1,5 @@
 /* ========================================
-   VERDANT WEATHER DASHBOARD
+   SKYVIEW WEATHER DASHBOARD
    OpenWeatherMap API Integration
 ======================================== */
 

@@ -6,12 +6,13 @@
 
     <meta
       name="description"
-      content="Verdant is a real-time weather dashboard showing current weather conditions and forecasts for cities around the world."
+      content="SkyView is a real-time weather dashboard showing current weather conditions and forecasts for cities around the world."
     />
 
-    <meta name="theme-color" content="#064E3B" />
+    <meta name="theme-color" content="#6554A4" />
 
-    <title>Verdant | See Beyond the Forecast</title>
+    <title>SkyView | See Beyond the Forecast</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/skyview.svg" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,7 +30,7 @@
     <main class="dashboard-container">
       <!-- LEFT SEARCH PANEL -->
       <aside class="search-panel glass-panel">
-        <!-- VERDANT BRAND -->
+        <!-- SKYVIEW BRAND -->
         <div class="app-brand">
           <div class="brand-lockup">
             <div class="brand-logo" aria-hidden="true">
@@ -41,85 +42,75 @@
               >
                 <defs>
                   <linearGradient
-                    id="cloudGradient"
+                    id="skyviewSunGradient"
                     x1="0"
                     y1="0"
                     x2="1"
                     y2="1"
                   >
-                    <stop offset="0%" stop-color="#FFFFFF" />
-                    <stop offset="55%" stop-color="#E0F2FE" />
-                    <stop offset="100%" stop-color="#A7D8E8" />
+                    <stop offset="0%" stop-color="#FFE28A" />
+                    <stop offset="100%" stop-color="#F2A64A" />
                   </linearGradient>
-
                   <linearGradient
-                    id="cloudHighlight"
+                    id="skyviewCloudGradient"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
+                    <stop offset="0%" stop-color="#62DDEB" />
+                    <stop offset="48%" stop-color="#719FEA" />
+                    <stop offset="100%" stop-color="#7862C8" />
+                  </linearGradient>
+                  <linearGradient
+                    id="skyviewCloudHighlight"
                     x1="0"
                     y1="0"
                     x2="0"
                     y2="1"
                   >
                     <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9" />
-                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.12" />
                   </linearGradient>
-
-                  <filter
-                    id="cloudShadow"
-                    x="-30%"
-                    y="-30%"
-                    width="160%"
-                    height="160%"
-                  >
-                    <feGaussianBlur stdDeviation="3" />
-                  </filter>
                 </defs>
 
-                <ellipse
-                  cx="51"
-                  cy="72"
-                  rx="29"
-                  ry="5"
-                  fill="#022C22"
-                  opacity="0.3"
-                  filter="url(#cloudShadow)"
-                />
-
-                <path
-                  d="M27 68
-                     C17 68 12 61 12 53
-                     C12 44 19 37 29 37
-                     C32 24 43 17 55 19
-                     C67 20 75 29 76 40
-                     C87 40 94 47 94 56
-                     C94 64 87 70 78 70
-                     Z"
-                  fill="url(#cloudGradient)"
-                />
-
-                <path
-                  d="M23 48
-                     C25 36 34 27 46 26
-                     C56 25 65 31 68 39"
+                <g
                   fill="none"
-                  stroke="url(#cloudHighlight)"
-                  stroke-width="5"
+                  stroke="#F2A64A"
                   stroke-linecap="round"
+                  stroke-width="3"
+                >
+                  <path d="M67 8v6" />
+                  <path d="m82 14-4 4" />
+                  <path d="M88 29h-6" />
+                  <path d="m77 43-4-4" />
+                </g>
+                <circle
+                  cx="67"
+                  cy="28"
+                  r="15"
+                  fill="url(#skyviewSunGradient)"
                 />
-
                 <path
-                  d="M27 62 C42 68 66 68 80 62"
-                  fill="none"
-                  stroke="#8CC7D8"
+                  d="M24 70c-8 0-13-5.3-13-12.1 0-6.6 5-11.9 12-12.4C25.4 33 34.6 25 46 25c11.1 0 19.7 7.5 21.3 18.2h2.1c8.1 0 14.6 6.1 14.6 13.7S77.5 71 69.4 71H24z"
+                  fill="url(#skyviewCloudGradient)"
+                  stroke="#FFFFFF"
+                  stroke-opacity="0.75"
                   stroke-width="2"
-                  opacity="0.5"
+                />
+                <path
+                  d="M27 48c1.7-7.5 8-12.6 15.7-12.6 6.9 0 12.6 4.1 14.8 10.1"
+                  fill="none"
+                  stroke="url(#skyviewCloudHighlight)"
                   stroke-linecap="round"
+                  stroke-width="4"
                 />
               </svg>
             </div>
 
             <div class="brand-copy">
-              <h1>Verdant</h1>
-              <p>See beyond the forecast.</p>
+              <h1>SkyView</h1>
+              <p>See Beyond the Forecast.</p>
             </div>
           </div>
         </div>
