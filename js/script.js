@@ -357,6 +357,7 @@ function saveCitiesToStorage(cities) {
  * Render recent cities in the #recent-cities list.
  * Supports keyboard accessibility (Enter/Space) via role="button" and tabindex.
  */
+
 function renderRecentCities() {
   const recentCitiesList = document.getElementById("recent-cities");
 
@@ -375,26 +376,18 @@ function renderRecentCities() {
     return;
   }
 
-  // Render each city (most recent first)
   cities.forEach((city) => {
     const listItem = document.createElement("li");
-    listItem.role = "button";
-    listItem.tabIndex = 0;
-    listItem.textContent = city;
 
-    // Click event - search for this city
-    listItem.addEventListener("click", () => {
+    const cityButton = document.createElement("button");
+    cityButton.type = "button";
+    cityButton.textContent = city;
+
+    cityButton.addEventListener("click", () => {
       searchCity(city);
     });
 
-    // Keyboard accessibility: Enter and Space
-    listItem.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        searchCity(city);
-      }
-    });
-
+    listItem.appendChild(cityButton);
     recentCitiesList.appendChild(listItem);
   });
 }

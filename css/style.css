@@ -3,15 +3,15 @@
 ======================================== */
 
 :root {
-  --color-blueberry-primary: #30245F;
-  --color-blueberry-secondary: #6554A4;
-  --color-cream-soda: #F8EBCB;
-  --color-vanilla-cream: #FFF9EA;
-  --color-lavender-accent: #B9A8E8;
-  --color-golden-accent: #D8A94D;
-  --color-cloud-blue: #EDF2FA;
-  --color-ambient-lavender: #E9E2F7;
-  --color-main-text: #29233F;
+  --color-blueberry-primary: #30245f;
+  --color-blueberry-secondary: #6554a4;
+  --color-cream-soda: #f8ebcb;
+  --color-vanilla-cream: #fff9ea;
+  --color-lavender-accent: #b9a8e8;
+  --color-golden-accent: #d8a94d;
+  --color-cloud-blue: #edf2fa;
+  --color-ambient-lavender: #e9e2f7;
+  --color-main-text: #29233f;
   --color-muted-text: #777184;
 
   --color-background: var(--color-cloud-blue);
@@ -21,7 +21,7 @@
   --color-primary-blue: var(--color-blueberry-primary);
   --color-sky-blue: var(--color-lavender-accent);
   --color-success: var(--color-golden-accent);
-  --color-border: #E6DDC7;
+  --color-border: #e6ddc7;
   --color-shadow: rgba(48, 36, 95, 0.12);
   --color-focus-outline: var(--color-blueberry-secondary);
   --border-radius: 18px;
@@ -488,7 +488,7 @@ body {
 }
 
 .forecast-card:nth-child(even) {
-  background: #F3EDFA;
+  background: #f3edfa;
 }
 
 .forecast-day,
@@ -1019,6 +1019,23 @@ body {
 
 .search-panel .recent-searches .empty-history {
   color: var(--color-secondary-text);
+}
+
+.search-panel .recent-searches li button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-panel .recent-searches li button:focus-visible {
+  outline: 3px solid var(--color-focus-outline);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 /* ========================================
