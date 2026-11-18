@@ -5,7 +5,7 @@
 
 // 1. API CONFIGURATION
 
-const API_KEY = window.OPENWEATHER_API_KEY;
+const WEATHER_API_BASE = "https://skyview-weather-proxy.mercykimutai-com.workers.dev";
 
 // 2. HTML ELEMENT REFERENCES
 
@@ -231,11 +231,6 @@ searchForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  if (!API_KEY || API_KEY === "YOUR_API_KEY_HERE") {
-    searchError.textContent = "Please configure your weather API key.";
-    return;
-  }
-
   searchError.textContent = "";
 
   try {
@@ -409,7 +404,7 @@ renderRecentCities();
 
 async function getWeather(city) {
   // 1. Find the city's geographical coordinates
-  const geocodingURL = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`;
+  const geocodingURL = `${WEATHER_API_BASE}/geo?city=${encodeURIComponent(city)}`;
 
   const locations = await fetchWeatherData(geocodingURL, "geocoding");
 
@@ -435,7 +430,7 @@ async function getWeather(city) {
   const country = locations[0].country;
 
   // 4. Fetch current weather
-  const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
+  const weatherURL = `${WEATHER_API_BASE}/current?lat=${latitude}&lon=${longitude}`;
 
   const weatherData = await fetchWeatherData(weatherURL, "current");
   validateCurrentWeather(weatherData);
@@ -492,7 +487,7 @@ async function loadForecast(latitude, longitude) {
     forecastList.setAttribute("aria-busy", "true");
     renderForecastMessage("Loading forecast data...");
 
-    const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
+    const forecastURL = `${WEATHER_API_BASE}/forecast?lat=${latitude}&lon=${longitude}`;
     const forecastData = await fetchWeatherData(forecastURL, "forecast");
 
     const timezoneOffset = forecastData.city && forecastData.city.timezone;
@@ -722,7 +717,7 @@ locationButton.addEventListener("click", () => {
         weatherStatus.textContent = "Loading your local weather...";
         locationButton.textContent = "Loading weather...";
 
-        const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`;
+        const weatherURL = `${WEATHER_API_BASE}/current?lat=${latitude}&lon=${longitude}`;
 
         const weatherData = await fetchWeatherData(weatherURL, "current");
         validateCurrentWeather(weatherData, true);
