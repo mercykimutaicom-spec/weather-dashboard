@@ -2,46 +2,80 @@
 
 **See Beyond the Forecast.**
 
-SkyView is a responsive weather dashboard for checking current conditions, local weather, recent city searches, and a dynamic three-day forecast. Its Blueberry and Cream Soda interface keeps weather information clear across desktop, tablet, and mobile screens.
+SkyView is a responsive weather dashboard that allows users to search for cities, view real-time weather conditions, and access a five-day forecast. It also supports browser-based geolocation and saves recent searches for convenient access.
+
+**Live Demo:** https://mercykimutaicom-spec.github.io/weather-dashboard/
+
+**GitHub Repository:** https://github.com/mercykimutaicom-spec/weather-dashboard
 
 ## Features
 
-- **City Search:** Find current weather by city name.
-- **Current Location:** Retrieve local weather using browser geolocation.
-- **Recent Searches:** Save up to five successfully searched cities in browser Local Storage.
-- **Three-Day Forecast:** View a dynamic forecast for the next three calendar days.
-- **Weather Details:** See current temperature, feels-like temperature, humidity, wind speed, visibility, atmospheric pressure, sunrise, and sunset.
-- **Dynamic Weather Themes:** The weather overview adapts its theme to current conditions and day or night.
-- **Loading and Error States:** Get clear feedback while requests run or when a request fails.
-- **Responsive Layout:** Use the dashboard on desktop, tablet, or mobile.
-- **Accessible Interactions:** Navigate recent searches and card disclosures with a keyboard and receive status announcements.
+- **City Search:** Search for weather information by city name.
+- **Current Weather:** View temperature, weather conditions and other weather information.
+- **Five-Day Forecast:** Explore upcoming weather conditions.
+- **Geolocation:** Get weather information based on your current location.
+- **Search History:** Access previously searched cities.
+- **Responsive Design:** Use the dashboard across different screen sizes.
+- **Weather-Based Interface:** Dynamic weather themes and icons.
 
 ## Technologies Used
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- OpenWeatherMap API
-- Fetch API
-- Browser Geolocation API
-- Browser Local Storage
+| Technology              | Purpose                             |
+| ----------------------- | ----------------------------------- |
+| HTML5                   | Application structure               |
+| CSS3                    | Styling and responsive design       |
+| JavaScript              | Application logic and interactivity |
+| OpenWeatherMap API      | Weather and geocoding data          |
+| Fetch API               | Asynchronous HTTP requests          |
+| Browser Geolocation API | Location detection                  |
+| Local Storage           | Saving recent searches              |
+| Cloudflare Workers      | Secure API proxy                    |
+| Git & GitHub            | Version control and hosting         |
+| GitHub Pages            | Application deployment              |
+
+## How It Works
+
+SkyView uses a Cloudflare Worker as an intermediary between the frontend and OpenWeatherMap.
+
+Instead of exposing the OpenWeatherMap API key in the frontend, the application sends requests to the Cloudflare Worker. The Worker retrieves the API key from its securely configured environment secret and communicates with OpenWeatherMap.
+
+### API Request Flow
+
+1. The user searches for a city or requests their current location.
+2. JavaScript sends a request to the Cloudflare Worker.
+3. The Worker retrieves the API key from its environment secret.
+4. The Worker communicates with OpenWeatherMap.
+5. Weather data is returned to the frontend.
+6. JavaScript processes and displays the information.
+
+### Worker Endpoints
+
+- `/geo?city={city}` – City geocoding.
+- `/current?lat={latitude}&lon={longitude}` – Current weather.
+- `/forecast?lat={latitude}&lon={longitude}` – Five-day forecast.
 
 ## Project Structure
 
 ```text
 WeatherDashboard/
-├── index.html
-├── README.md
+│
 ├── assets/
 │   ├── icons/
-│   │   └── skyview.svg
 │   └── images/
+│
 ├── css/
 │   └── style.css
-└── js/
-    ├── config.js
-    └── script.js
+│
+├── js/
+│   ├── config.js
+│   └── script.js
+│
+├── .gitignore
+├── index.html
+└── README.md
 ```
+
+**Note:** `config.js` is a local configuration file and should not be committed if it contains private credentials. The deployed application uses the Cloudflare Worker integration.
 
 ## Getting Started
 
@@ -53,49 +87,55 @@ git clone https://github.com/mercykimutaicom-spec/weather-dashboard.git
 
 ### 2. Open the project
 
-Open the cloned `weather-dashboard` folder in Visual Studio Code.
+```bash
+cd weather-dashboard
+```
 
-### 3. Configure the API key
+### 3. Configure the Cloudflare Worker
 
-SkyView uses the [OpenWeatherMap API](https://openweathermap.org/).
+Deploy your own Cloudflare Worker and configure an environment secret named:
 
-1. Create an OpenWeatherMap account and generate an API key.
-2. Add the key to your local `js/config.js` file using the expected variable:
+```text
+OPENWEATHER_API_KEY
+```
 
-   ```javascript
-   window.OPENWEATHER_API_KEY = "YOUR_API_KEY";
-   ```
+Set the secret value to your OpenWeatherMap API key.
 
-Replace the placeholder locally with your key. Do not publish a real API key or commit it to the repository.
+Configure the allowed frontend origins in the Worker and update the Worker URL in `js/script.js` if using a different deployment.
 
-### 4. Run the application
+### 4. Run locally
 
-Open `index.html` using the Visual Studio Code Live Server extension.
+Open the project in VS Code and launch `index.html` using Live Server.
 
-## How to Use
+Ensure the Live Server origin is included in the Worker's allowed origins.
 
-1. Enter a city in the search field and select **Search** or press Enter.
-2. View the current conditions and three-day forecast.
-3. Select **Use My Current Location** to request weather for your location.
-4. Select a saved city under **Recent Searches** to load it again.
-5. Expand the weather cards for additional information.
+## Security
 
-## Live Demo
+- The OpenWeatherMap API key is stored as a Cloudflare Worker secret.
+- The frontend communicates with the Worker instead of directly exposing the API key.
+- CORS restrictions control which browser origins can access the Worker.
 
-No public demo URL is currently configured.
+## What I Learned
 
-## Author
+Building SkyView strengthened my practical understanding of:
 
-**Mercy Jerotich Kimutai**
+- Working with third-party APIs.
+- JavaScript asynchronous programming.
+- Fetch API and JSON response handling.
+- Browser geolocation.
+- Local Storage.
+- Serverless architecture using Cloudflare Workers.
+- API key management and CORS.
+- Debugging API integration issues.
+- GitHub version control and deployment.
 
-- GitHub: [mercykimutaicom-spec](https://github.com/mercykimutaicom-spec)
-- Repository: [SkyView Weather Dashboard](https://github.com/mercykimutaicom-spec/weather-dashboard)
+## Project Information
 
-## Acknowledgements
-
-- [OpenWeatherMap](https://openweathermap.org/) for weather data and API services.
-- Elevvo Pathways for the Frontend Development internship learning opportunity.
+**Project:** SkyView – Weather Dashboard  
+**Program:** Elevvo Pathways – Frontend Development  
+**Project Number:** Project 4  
+**Developer:** Mercy Jerotich Kimutai
 
 ---
 
-_Built with HTML, CSS, and vanilla JavaScript._
+_Built as part of my frontend development learning journey._
